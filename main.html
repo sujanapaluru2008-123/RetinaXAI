@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100 selection:bg-teal-500 selection:text-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetinaXAI Enterprise - Tele-Ophthalmology & Explainable AI Diagnostics</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                            950: '#042f2e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .nav-tab.active {
+            color: #2dd4bf;
+            border-bottom: 2px solid #2dd4bf;
+            background: rgba(20, 184, 166, 0.08);
+        }
+        @media print {
+            body * { visibility: hidden; }
+            #printable-report, #printable-report * { visibility: visible; }
+            #printable-report { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased overflow-x-hidden bg-slate-950">
+
+    <!-- Top System Bar -->
+    <header class="no-print sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 text-slate-200">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+            
+            <!-- Logo & Node Context -->
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-teal-600 to-cyan-500 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-teal-500/20 text-xl">
+                        👁️
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h1 class="font-extrabold tracking-tight text-white text-base">Retina<span class="text-teal-400">XAI</span></h1>
+                            <span class="px-2 py-0.5 text-[10px] uppercase font-mono font-bold tracking-wider rounded bg-teal-500/10 text-teal-300 border border-teal-500/30">v4.2 Clinical Enterprise</span>
+                        </div>
+                        <p class="text-xs text-slate-400 font-medium">Rural Tele-Ophthalmology & Explainable DR Screening</p>
+                    </div>
+                </div>
+
+                <div class="hidden lg:flex items-center space-x-2 border-l border-slate-800 pl-4 text-xs">
+                    <span class="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-1.5 font-medium">
+                        <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Node: <strong class="text-white">PHC #04 (Nanded District)</strong>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-1.5 font-medium">
+                        <i data-lucide="cpu" class="w-3.5 h-3.5 text-teal-400"></i>
+                        Edge Model: <strong class="text-teal-300">ViT-B16 + YOLOv9 (0.38s/scan)</strong>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Right Profile & Operational Status -->
+            <div class="flex items-center space-x-3 text-xs">
+                <div class="hidden sm:flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/80">
+                    <i data-lucide="wifi" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span class="text-slate-300">Syncing: <strong class="text-emerald-400">Civil Hospital Server</strong></span>
+                </div>
+
+                <div class="flex items-center space-x-2 pl-2 border-l border-slate-800">
+                    <div class="h-8 w-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-teal-400">
+                        DR
+                    </div>
+                    <div class="hidden md:block text-left">
+                        <p class="font-bold text-slate-200 leading-none">Dr. A. Kulkarni</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Medical Officer (PHC)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Navigation Tabs -->
+        <nav class="bg-slate-900 border-t border-slate-800/80 text-xs">
+            <div class="max-w-[1600px] mx-auto px-4 sm:px-6 flex space-x-1 sm:space-x-6 overflow-x-auto custom-scrollbar">
+                <button onclick="switchTab('workbench')" id="tab-workbench" class="nav-tab active py-3 px-3 font-semibold text-slate-300 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="scan" class="w-4 h-4"></i>
+                    <span>AI Diagnostic Workbench</span>
+                </button>
+                <button onclick="switchTab('history')" id="tab-history" class="nav-tab py-3 px-3 font-semibold text-slate-300 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="line-chart" class="w-4 h-4"></i>
+                    <span>Longitudinal DR History</span>
+                </button>
+                <button onclick="switchTab('queue')" id="tab-queue" class="nav-tab py-3 px-3 font-semibold text-slate-300 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="network" class="w-4 h-4"></i>
+                    <span>Telemedicine Hub & Network</span>
+                </button>
+                <button onclick="switchTab('consult')" id="tab-consult" class="nav-tab py-3 px-3 font-semibold text-slate-300 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="message-square text-teal-400" class="w-4 h-4"></i>
+                    <span>Specialist Tele-Consultation</span>
+                </button>
+                <button onclick="switchTab('report')" id="tab-report" class="nav-tab py-3 px-3 font-semibold text-slate-300 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    <span>Specialist Clinical Report</span>
+                </button>
+                <button onclick="switchTab('atlas')" id="tab-atlas" class="nav-tab py-3 px-3 font-semibold text-slate-300 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    <span>XAI Architecture & Pathology Atlas</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Workspace Body -->
+    <main class="flex-1 max-w-[1600px] w-full mx-auto p-4 sm:p-6 space-y-6">
+
+        <!-- TAB 1: AI DIAGNOSTIC WORKBENCH -->
+        <section id="content-workbench" class="tab-content space-y-6">
+            <div class="grid lg:grid-cols-12 gap-6">
+
+                <!-- Left Panel: Patient Metadata & Scan Selection (4 cols) -->
+                <div class="lg:col-span-4 space-y-6">
+                    
+                    <!-- Patient Profile Card -->
+                    <div class="glass-panel rounded-2xl p-5 space-y-4 shadow-xl">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="user-check" class="w-4 h-4 text-teal-400"></i>
+                                <h3 class="font-bold text-white text-sm">Patient Metadata</h3>
+                            </div>
+                            <span class="px-2 py-0.5 text-[10px] font-mono font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30 rounded">Active Visit</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Patient ID</span>
+                                <input type="text" id="p-id" value="PHC-NND-2026-894" class="w-full bg-transparent font-mono font-bold text-teal-300 focus:outline-none">
+                            </div>
+                            <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Full Name</span>
+                                <input type="text" id="p-name" value="Ramesh Patil" class="w-full bg-transparent font-bold text-white focus:outline-none">
+                            </div>
+                            <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Age / Gender</span>
+                                <input type="text" id="p-age" value="54 Yrs / Male" class="w-full bg-transparent font-medium text-slate-200 focus:outline-none">
+                            </div>
+                            <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Diabetes History</span>
+                                <input type="text" id="p-duration" value="8 Yrs (HbA1c 8.4%)" class="w-full bg-transparent font-medium text-amber-400 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Case Selection Buttons -->
+                        <div class="space-y-2 border-t border-slate-800/80 pt-3">
+                            <label class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                                <span>Load Clinical Scan Preset:</span>
+                                <span class="text-[10px] text-teal-400">4 Scans Available</span>
+                            </label>
+
+                            <div class="space-y-2 text-xs">
+                                <button onclick="loadPreset('mod_npdr')" id="preset-mod_npdr" class="preset-btn w-full text-left p-3 rounded-xl border border-slate-800 hover:border-teal-500/50 bg-slate-900/60 hover:bg-slate-900 transition flex items-center justify-between group">
+                                    <div>
+                                        <div class="font-bold text-slate-200 group-hover:text-teal-300 transition">Case #1: Ramesh Patil</div>
+                                        <div class="text-[11px] text-slate-400">Moderate NPDR (Exudates + MAs)</div>
+                                    </div>
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">Grade 2</span>
+                                </button>
+
+                                <button onclick="loadPreset('normal')" id="preset-normal" class="preset-btn w-full text-left p-3 rounded-xl border border-slate-800 hover:border-teal-500/50 bg-slate-900/60 hover:bg-slate-900 transition flex items-center justify-between group">
+                                    <div>
+                                        <div class="font-bold text-slate-200 group-hover:text-teal-300 transition">Case #2: Anita Devi</div>
+                                        <div class="text-[11px] text-slate-400">Normal Healthy Retinal Fundus</div>
+                                    </div>
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Grade 0</span>
+                                </button>
+
+                                <button onclick="loadPreset('pdr')" id="preset-pdr" class="preset-btn w-full text-left p-3 rounded-xl border border-slate-800 hover:border-teal-500/50 bg-slate-900/60 hover:bg-slate-900 transition flex items-center justify-between group">
+                                    <div>
+                                        <div class="font-bold text-slate-200 group-hover:text-teal-300 transition">Case #3: Gopal Rao</div>
+                                        <div class="text-[11px] text-slate-400">Proliferative DR (Neovascularization)</div>
+                                    </div>
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30">Grade 4</span>
+                                </button>
+
+                                <button onclick="loadPreset('bad_iqa')" id="preset-bad_iqa" class="preset-btn w-full text-left p-3 rounded-xl border border-slate-800 hover:border-teal-500/50 bg-slate-900/60 hover:bg-slate-900 transition flex items-center justify-between group">
+                                    <div>
+                                        <div class="font-bold text-slate-200 group-hover:text-teal-300 transition">Case #4: Field Motion Blur</div>
+                                        <div class="text-[11px] text-slate-400">Low Illumination (Edge IQA Reject)</div>
+                                    </div>
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold font-mono bg-rose-500/20 text-rose-300 border border-rose-500/30">IQA Fail</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Run AI Execution Button -->
+                        <div class="pt-2">
+                            <button onclick="runAIPipeline()" id="btn-run-pipeline" class="w-full bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-slate-950 font-extrabold py-3.5 px-4 rounded-xl shadow-lg shadow-teal-500/20 transition-all flex items-center justify-center space-x-2 text-sm tracking-wide">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                <span>Execute 5-Stage AI Inference Engine</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pipeline Execution Status Progress Card -->
+                    <div id="status-card" class="glass-panel rounded-2xl p-5 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-300 text-xs uppercase tracking-wider font-mono flex items-center gap-1.5">
+                                <i data-lucide="activity" class="w-3.5 h-3.5 text-teal-400"></i>
+                                AI Pipeline Execution Trace
+                            </h4>
+                            <span id="pipeline-status-tag" class="text-[10px] text-slate-400 font-mono">Ready</span>
+                        </div>
+                        
+                        <div class="space-y-2 text-xs font-mono" id="pipeline-steps">
+                            <div id="step-1" class="flex items-center justify-between text-slate-500">
+                                <span>1. Wavelet IQA & CLAHE Green Channel</span>
+                                <span class="step-badge">Idle</span>
+                            </div>
+                            <div id="step-2" class="flex items-center justify-between text-slate-500">
+                                <span>2. Landmark Segmentation (FPN)</span>
+                                <span class="step-badge">Idle</span>
+                            </div>
+                            <div id="step-3" class="flex items-center justify-between text-slate-500">
+                                <span>3. YOLOv9 Microaneurysm Patching</span>
+                                <span class="step-badge">Idle</span>
+                            </div>
+                            <div id="step-4" class="flex items-center justify-between text-slate-500">
+                                <span>4. Vision Transformer Classification</span>
+                                <span class="step-badge">Idle</span>
+                            </div>
+                            <div id="step-5" class="flex items-center justify-between text-slate-500">
+                                <span>5. Temperature Scaling & Grad-CAM Map</span>
+                                <span class="step-badge">Idle</span>
+                            </div>
+                        </div>
+
+                        <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden mt-3">
+                            <div id="pipeline-progress" class="bg-gradient-to-r from-teal-500 to-cyan-400 h-1.5 w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <!-- Feature Attribution Waterfall Chart (SHAP) -->
+                    <div class="glass-panel rounded-2xl p-5 space-y-3">
+                        <h4 class="font-bold text-slate-300 text-xs uppercase tracking-wider font-mono flex items-center gap-1.5">
+                            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-teal-400"></i>
+                            XAI Feature Attribution (SHAP)
+                        </h4>
+                        <div class="h-[180px] relative">
+                            <canvas id="chartShap"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Panel: Interactive Fundus Inspector Canvas (8 cols) -->
+                <div class="lg:col-span-8 space-y-6">
+                    
+                    <div class="glass-panel rounded-2xl p-5 space-y-4 shadow-xl">
+                        
+                        <!-- Inspector Controls Header -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                            <div>
+                                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                                    <i data-lucide="eye" class="w-5 h-5 text-teal-400"></i>
+                                    Ocular Fundus Interactive DICOM Viewer
+                                </h3>
+                                <p class="text-xs text-slate-400">Sub-pixel lesion rendering, layer overlays, and calibrated measurement tool</p>
+                            </div>
+                            
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs text-slate-400 font-medium">Eye Examined:</span>
+                                <button onclick="toggleEye('OD')" id="btn-eye-od" class="px-3 py-1 text-xs rounded-lg font-bold bg-teal-500 text-slate-950 transition">OD (Right)</button>
+                                <button onclick="toggleEye('OS')" id="btn-eye-os" class="px-3 py-1 text-xs rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">OS (Left)</button>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Image Manipulation & DICOM Tool Toolbar -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 p-3 rounded-xl border border-slate-800 text-xs">
+                            
+                            <!-- Layer Toggles -->
+                            <div class="flex flex-wrap gap-2">
+                                <label class="inline-flex items-center space-x-1.5 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 text-slate-200 cursor-pointer">
+                                    <input type="checkbox" id="layer-raw" checked onchange="renderCanvasLayers()" class="rounded border-slate-700 text-teal-500 focus:ring-0">
+                                    <span>Raw Scan</span>
+                                </label>
+                                <label class="inline-flex items-center space-x-1.5 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 text-slate-200 cursor-pointer">
+                                    <input type="checkbox" id="layer-clahe" checked onchange="renderCanvasLayers()" class="rounded border-slate-700 text-teal-500 focus:ring-0">
+                                    <span class="text-teal-300 font-medium">CLAHE Green</span>
+                                </label>
+                                <label class="inline-flex items-center space-x-1.5 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 text-slate-200 cursor-pointer">
+                                    <input type="checkbox" id="layer-gradcam" checked onchange="renderCanvasLayers()" class="rounded border-slate-700 text-teal-500 focus:ring-0">
+                                    <span class="text-rose-400 font-bold">Grad-CAM Map</span>
+                                </label>
+                                <label class="inline-flex items-center space-x-1.5 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 text-slate-200 cursor-pointer">
+                                    <input type="checkbox" id="layer-ma" checked onchange="renderCanvasLayers()" class="rounded border-slate-700 text-teal-500 focus:ring-0">
+                                    <span class="text-red-400 font-bold">Microaneurysms</span>
+                                </label>
+                                <label class="inline-flex items-center space-x-1.5 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 text-slate-200 cursor-pointer">
+                                    <input type="checkbox" id="layer-ex" checked onchange="renderCanvasLayers()" class="rounded border-slate-700 text-teal-500 focus:ring-0">
+                                    <span class="text-amber-300 font-bold">Exudates</span>
+                                </label>
+                                <label class="inline-flex items-center space-x-1.5 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 text-slate-200 cursor-pointer">
+                                    <input type="checkbox" id="layer-landmarks" checked onchange="renderCanvasLayers()" class="rounded border-slate-700 text-teal-500 focus:ring-0">
+                                    <span class="text-emerald-400 font-bold">Landmarks</span>
+                                </label>
+                            </div>
+
+                            <!-- Image Controls (Zoom, Contrast, Ruler) -->
+                            <div class="flex items-center space-x-2 border-l border-slate-800 pl-3">
+                                <button onclick="setTool('select')" id="tool-select" class="p-1.5 rounded-lg bg-teal-500/20 text-teal-300 border border-teal-500/40" title="Pan / Inspect">
+                                    <i data-lucide="move" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="setTool('ruler')" id="tool-ruler" class="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700" title="Measurement Ruler (mm)">
+                                    <i data-lucide="ruler" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="toggleInvert()" id="tool-invert" class="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700" title="Invert Color Space">
+                                    <i data-lucide="contrast" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="resetZoom()" class="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700" title="Reset Zoom">
+                                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Grad-CAM Heatmap Opacity Slider & Brightness -->
+                        <div class="grid sm:grid-cols-2 gap-4 bg-slate-900/40 p-2.5 rounded-xl border border-slate-800 text-xs">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-slate-400 font-mono w-28">Grad-CAM Opacity:</span>
+                                <input type="range" id="gradcam-opacity" min="0" max="100" value="65" oninput="renderCanvasLayers()" class="w-full accent-teal-400">
+                                <span id="opacity-val" class="font-mono text-teal-300 w-8">65%</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-slate-400 font-mono w-28">Contrast Enhancer:</span>
+                                <input type="range" id="contrast-val" min="80" max="180" value="120" oninput="renderCanvasLayers()" class="w-full accent-teal-400">
+                                <span id="contrast-disp" class="font-mono text-teal-300 w-8">1.2x</span>
+                            </div>
+                        </div>
+
+                        <!-- Main Canvas Container -->
+                        <div class="relative rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center min-h-[420px] cursor-crosshair">
+                            <canvas id="fundusCanvas" width="800" height="550" class="w-full h-auto max-h-[550px] object-contain"></canvas>
+
+                            <!-- Calibration Measurement Overlay Box -->
+                            <div id="ruler-info-box" class="hidden absolute top-4 left-4 bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-lg border border-teal-500/40 text-xs font-mono text-teal-300 shadow-xl space-y-0.5">
+                                <div><strong class="text-white">Ruler Measurement:</strong></div>
+                                <div id="ruler-dist-px">Distance: 0 px</div>
+                                <div id="ruler-dist-mm" class="text-emerald-400 font-bold">Distance: 0.00 mm</div>
+                            </div>
+
+                            <!-- Overlaid Rejection Banner if IQA fails -->
+                            <div id="iqa-rejection-overlay" class="hidden absolute inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center text-center p-6 space-y-4">
+                                <div class="h-16 w-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 text-3xl">
+                                    ⚠️
+                                </div>
+                                <h4 class="text-xl font-bold text-rose-400">IMAGE REJECTED BY EDGE IQA</h4>
+                                <p class="text-xs text-slate-300 max-w-md leading-relaxed font-mono">
+                                    Wavelet high-frequency energy parameter ($\mu_G = 0.12$) is below standard threshold ($\theta = 0.28$). Motion defocus or pupil un-saturation detected.
+                                </p>
+                                <div class="p-3 bg-rose-950/60 border border-rose-800/80 rounded-xl text-rose-200 text-xs font-mono text-left space-y-1">
+                                    <div><strong>OPERATOR ACTION REQUIRED:</strong></div>
+                                    <div>1. Ensure 5-minute pupil dilation (Tropicamide 1%)</div>
+                                    <div>2. Adjust lens distance to 15mm from cornea</div>
+                                </div>
+                                <button onclick="loadPreset('mod_npdr')" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition border border-slate-700">
+                                    Load Valid Sample Case
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Diagnostic Output Metrics Card -->
+                        <div class="grid sm:grid-cols-4 gap-3 pt-2 text-xs">
+                            <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1">
+                                <span class="text-slate-400 block text-[10px] uppercase font-mono">ICDR Severity Grade</span>
+                                <span id="res-grade" class="text-sm font-extrabold text-amber-400 block">Level 2: Moderate NPDR</span>
+                            </div>
+                            <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1">
+                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Referability Triage</span>
+                                <span id="res-triage" class="text-sm font-extrabold text-rose-400 block">REFERABLE DR (High Risk)</span>
+                            </div>
+                            <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1">
+                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Calibrated Confidence</span>
+                                <span id="res-conf" class="text-sm font-extrabold text-teal-300 block">91.4% ($T=1.42$)</span>
+                            </div>
+                            <div class="p-3.5 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1">
+                                <span class="text-slate-400 block text-[10px] uppercase font-mono">Lesion Quantification</span>
+                                <span id="res-lesions" class="text-xs font-bold text-slate-200 block">14 MAs | 0.82mm² EX</span>
+                            </div>
+                        </div>
+
+                        <!-- Detected Lesion Breakdown Table -->
+                        <div class="space-y-2 border-t border-slate-800/80 pt-3">
+                            <h4 class="font-bold text-slate-300 text-xs uppercase tracking-wider font-mono">Detected Lesions & Coordinates Matrix</h4>
+                            <div class="overflow-x-auto custom-scrollbar">
+                                <table class="w-full text-left text-xs text-slate-300">
+                                    <thead class="bg-slate-900 text-slate-400 font-mono text-[10px] uppercase">
+                                        <tr>
+                                            <th class="p-2 rounded-l">Lesion ID</th>
+                                            <th class="p-2">Pathology Type</th>
+                                            <th class="p-2">Canvas Coordinates</th>
+                                            <th class="p-2">Detection Score</th>
+                                            <th class="p-2 rounded-r">Macular Proximity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="workbench-lesion-rows" class="divide-y divide-slate-800/60 font-mono">
+                                        <!-- Populated via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 2: LONGITUDINAL DR HISTORY & PATIENT TRACKING -->
+        <section id="content-history" class="tab-content hidden space-y-6">
+            <div class="glass-panel rounded-2xl p-6 space-y-6 shadow-xl">
+                
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2.5 py-1 bg-teal-500/20 text-teal-300 text-xs font-mono font-bold rounded border border-teal-500/30">Patient ID: PHC-NND-2026-894</span>
+                            <h3 class="text-xl font-bold text-white">Longitudinal DR Progression Timeline</h3>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Tracking disease evolution over 24 months across 5 consecutive telemedicine visits</p>
+                    </div>
+
+                    <div class="flex items-center space-x-3 text-xs">
+                        <div class="bg-slate-900 px-3 py-2 rounded-xl border border-slate-800">
+                            <span class="text-slate-400 block text-[10px]">Baseline DR Grade (2024):</span>
+                            <strong class="text-emerald-400 font-mono">Grade 0 (No DR)</strong>
+                        </div>
+                        <div class="bg-slate-900 px-3 py-2 rounded-xl border border-slate-800">
+                            <span class="text-slate-400 block text-[10px]">Current DR Grade (2026):</span>
+                            <strong class="text-amber-400 font-mono">Grade 2 (Mod NPDR)</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Longitudinal Chart Grid -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-200 text-xs uppercase font-mono">DR Grade & Microaneurysm Count Trajectory</h4>
+                            <span class="text-[10px] text-teal-400 font-mono">24 Month Delta</span>
+                        </div>
+                        <div class="h-[260px] relative">
+                            <canvas id="chartHistoryDR"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-200 text-xs uppercase font-mono">HbA1c Correlation vs Hard Exudates Area</h4>
+                            <span class="text-[10px] text-amber-400 font-mono">Systemic Factor</span>
+                        </div>
+                        <div class="h-[260px] relative">
+                            <canvas id="chartHistoryHbA1c"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patient Longitudinal Visit History Table -->
+                <div class="space-y-3">
+                    <h4 class="font-bold text-white text-sm">Historical Clinical Examination Logs</h4>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900 text-slate-400 font-mono text-[10px] uppercase">
+                                <tr>
+                                    <th class="p-3 rounded-l">Visit Date</th>
+                                    <th class="p-3">Facility Node</th>
+                                    <th class="p-3">ICDR Grade</th>
+                                    <th class="p-3">HbA1c Level</th>
+                                    <th class="p-3">MA Count</th>
+                                    <th class="p-3">Fovea Threat</th>
+                                    <th class="p-3 rounded-r">Action Taken</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/80 font-mono">
+                                <tr class="hover:bg-slate-900/50">
+                                    <td class="p-3 font-bold text-white">Oct 24, 2026 (Today)</td>
+                                    <td class="p-3">PHC #04 (Nanded)</td>
+                                    <td class="p-3 text-amber-400 font-bold">Level 2 (Mod NPDR)</td>
+                                    <td class="p-3 text-rose-400">8.4%</td>
+                                    <td class="p-3">14 MAs</td>
+                                    <td class="p-3 text-amber-300">0.9mm Superior</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">Referred Civil Hospital</span></td>
+                                </tr>
+                                <tr class="hover:bg-slate-900/50">
+                                    <td class="p-3">Apr 12, 2026</td>
+                                    <td class="p-3">PHC #04 (Nanded)</td>
+                                    <td class="p-3 text-yellow-400">Level 1 (Mild NPDR)</td>
+                                    <td class="p-3 text-amber-400">7.9%</td>
+                                    <td class="p-3">4 MAs</td>
+                                    <td class="p-3 text-slate-400">None</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">6-Month Follow-Up</span></td>
+                                </tr>
+                                <tr class="hover:bg-slate-900/50">
+                                    <td class="p-3">Oct 05, 2025</td>
+                                    <td class="p-3">PHC #04 (Nanded)</td>
+                                    <td class="p-3 text-yellow-400">Level 1 (Mild NPDR)</td>
+                                    <td class="p-3 text-amber-400">7.6%</td>
+                                    <td class="p-3">2 MAs</td>
+                                    <td class="p-3 text-slate-400">None</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">Dietary Control</span></td>
+                                </tr>
+                                <tr class="hover:bg-slate-900/50">
+                                    <td class="p-3">Nov 18, 2024</td>
+                                    <td class="p-3">PHC #04 (Nanded)</td>
+                                    <td class="p-3 text-emerald-400">Level 0 (No DR)</td>
+                                    <td class="p-3 text-emerald-400">6.8%</td>
+                                    <td class="p-3">0 MAs</td>
+                                    <td class="p-3 text-slate-400">None</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400">Annual Routine</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 3: DISTRICT TELEMEDICINE QUEUE & SIMULINK SIMULATOR -->
+        <section id="content-queue" class="tab-content hidden space-y-6">
+            <div class="glass-panel rounded-2xl p-6 space-y-6 shadow-xl">
+                
+                <div class="border-b border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Simulink Telemedicine Network Discrete-Event Simulator</h3>
+                        <p class="text-xs text-slate-400">Modelling district-level screening queue dynamics ($\lambda, \mu, M/M/c/K$) across 20 satellite PHC nodes</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="px-3 py-1 bg-teal-500/20 text-teal-300 text-xs font-mono font-bold rounded-full border border-teal-500/30">SimEvents Kernel Active</span>
+                    </div>
+                </div>
+
+                <!-- Interactive Simulation Controls -->
+                <div class="grid md:grid-cols-4 gap-4 p-4 bg-slate-900/80 rounded-2xl border border-slate-800 text-xs">
+                    <div>
+                        <label class="font-bold text-slate-300 block mb-1">Cellular Uplink Bandwidth</label>
+                        <select id="sim-network" onchange="updateSimulinkModel()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-teal-500 font-mono">
+                            <option value="2g">2G EDGE Rural (64 kbps)</option>
+                            <option value="3g" selected>3G Data Network (1.2 Mbps)</option>
+                            <option value="4g">4G LTE Tower (12 Mbps)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="font-bold text-slate-300 block mb-1">Edge Compression Engine</label>
+                        <select id="sim-compression" onchange="updateSimulinkModel()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-teal-500 font-mono">
+                            <option value="compressed" selected>Edge JPEG (~800 KB Payload)</option>
+                            <option value="raw">Raw Uncompressed (12 MB DICOM)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="font-bold text-slate-300 block mb-1">PHC Daily Intake Rate ($\lambda$)</label>
+                        <input type="range" id="sim-lambda" min="10" max="80" value="35" oninput="updateSimulinkModel()" class="w-full accent-teal-400 mt-2">
+                        <span id="sim-lambda-val" class="text-[11px] text-teal-300 font-mono">35 Patients / Day / PHC</span>
+                    </div>
+
+                    <div>
+                        <label class="font-bold text-slate-300 block mb-1">Central GPU Cluster ($c$ Threads)</label>
+                        <select id="sim-gpu" onchange="updateSimulinkModel()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-teal-500 font-mono">
+                            <option value="1">1 Central GPU Thread</option>
+                            <option value="2" selected>2 Parallel GPU Threads</option>
+                            <option value="4">4 Parallel GPU Cluster</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Simulation Charts Grid -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <h4 class="font-bold text-slate-200 text-xs font-mono uppercase">Image Uplink Latency Comparison (Seconds)</h4>
+                        <div class="h-[250px] relative">
+                            <canvas id="chartSimLatency"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <h4 class="font-bold text-slate-200 text-xs font-mono uppercase">District Specialist Workload Triaging Reduction (%)</h4>
+                        <div class="h-[250px] relative">
+                            <canvas id="chartSimWorkload"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Satellite PHC Node Queue Status Grid -->
+                <div class="space-y-3">
+                    <h4 class="font-bold text-white text-sm">Active Satellite Primary Health Center Telemetry (20 Deployed Nodes)</h4>
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs" id="phc-nodes-grid">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 4: SPECIALIST TELE-CONSULTATION WORKSPACE -->
+        <section id="content-consult" class="tab-content hidden space-y-6">
+            <div class="glass-panel rounded-2xl p-6 space-y-6 shadow-xl">
+                
+                <div class="border-b border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h3 class="text-xl font-bold text-white">Ophthalmology Specialist Live Tele-Consultation</h3>
+                            <span class="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold rounded-full border border-emerald-500/30 flex items-center gap-1">
+                                <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> Specialist Online
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Escalated Second-Opinion Channel with Nanded Civil Hospital Retina Department</p>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <button onclick="triggerSimulatedDoctorReply()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                            Simulate Doctor Response
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-12 gap-6">
+                    
+                    <!-- Chat Container (7 cols) -->
+                    <div class="lg:col-span-7 bg-slate-900/90 rounded-2xl border border-slate-800 flex flex-col h-[520px]">
+                        
+                        <!-- Chat Header -->
+                        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="h-9 w-9 rounded-full bg-teal-500/20 border border-teal-500/40 text-teal-300 flex items-center justify-center font-bold">
+                                    SD
+                                </div>
+                                <div>
+                                    <div class="font-bold text-white text-xs">Dr. S. K. Deshmukh, MD</div>
+                                    <div class="text-[10px] text-slate-400">Chief Vitreoretinal Specialist, Civil Hospital</div>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-mono text-slate-500">Encrypted P2P Signal</span>
+                        </div>
+
+                        <!-- Chat Messages Window -->
+                        <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4 text-xs custom-scrollbar">
+                            
+                            <div class="flex items-start space-x-2">
+                                <div class="h-7 w-7 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-[10px]">
+                                    PHC
+                                </div>
+                                <div class="bg-slate-800 p-3 rounded-2xl rounded-tl-none max-w-[80%] border border-slate-700 space-y-1">
+                                    <div class="flex justify-between items-center text-[10px] text-slate-400 font-mono">
+                                        <span>Dr. A. Kulkarni (PHC #04)</span>
+                                        <span>10:14 AM</span>
+                                    </div>
+                                    <p class="text-slate-200">Patient Ramesh Patil (54M, 8yr Diabetic). AI flagged Level 2 Moderate NPDR with 14 MAs and foveal exudates cluster (0.9mm). Requesting confirmation for laser photocoagulation referral.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-2 justify-end">
+                                <div class="bg-teal-950/80 p-3 rounded-2xl rounded-tr-none max-w-[80%] border border-teal-500/30 space-y-1">
+                                    <div class="flex justify-between items-center text-[10px] text-teal-400 font-mono">
+                                        <span>Dr. S. K. Deshmukh (Specialist)</span>
+                                        <span>10:16 AM</span>
+                                    </div>
+                                    <p class="text-teal-100">Reviewed fundus scan and Grad-CAM map. I concur with the AI classification. The exudates are encroaching the macular zone. Please book an urgent slot for Tuesday's laser clinic at Civil Hospital.</p>
+                                </div>
+                                <div class="h-7 w-7 rounded-full bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold text-[10px]">
+                                    MD
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Chat Input Box -->
+                        <div class="p-3 border-t border-slate-800 flex items-center gap-2">
+                            <input type="text" id="chat-input" placeholder="Type clinical note or question..." onkeypress="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-teal-500 font-sans">
+                            <button onclick="sendChatMessage()" class="p-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl transition">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- Tele-Consult Summary & Escalation Checklist (5 cols) -->
+                    <div class="lg:col-span-5 space-y-4">
+                        
+                        <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3 text-xs">
+                            <h4 class="font-bold text-white text-sm flex items-center gap-2">
+                                <i data-lucide="clipboard-check" class="w-4 h-4 text-teal-400"></i>
+                                Referral & Triage Escalation Directives
+                            </h4>
+
+                            <div class="space-y-2">
+                                <label class="flex items-start space-x-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800 cursor-pointer">
+                                    <input type="checkbox" checked class="mt-0.5 rounded text-teal-500 focus:ring-0">
+                                    <div>
+                                        <span class="font-bold text-slate-200 block">Confirm Referral to District Laser Clinic</span>
+                                        <span class="text-[10px] text-slate-400">Target slot within 14 days</span>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-start space-x-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800 cursor-pointer">
+                                    <input type="checkbox" checked class="mt-0.5 rounded text-teal-500 focus:ring-0">
+                                    <div>
+                                        <span class="font-bold text-slate-200 block">Prescribe Glycemic Tightening Protocol</span>
+                                        <span class="text-[10px] text-slate-400">Consult PHC Physician for HbA1c target &lt; 7.0%</span>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-start space-x-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800 cursor-pointer">
+                                    <input type="checkbox" class="mt-0.5 rounded text-teal-500 focus:ring-0">
+                                    <div>
+                                        <span class="font-bold text-slate-200 block">OCT Macular Scan Recommended</span>
+                                        <span class="text-[10px] text-slate-400">Evaluate Diabetic Macular Edema (DME) thickness</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <button onclick="switchTab('report')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-teal-300 font-bold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+                                <span>Export Consultation Log to Final Report</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 5: SPECIALIST CLINICAL DIAGNOSTIC REPORT -->
+        <section id="content-report" class="tab-content hidden space-y-6">
+            
+            <div class="flex justify-end no-print">
+                <button onclick="window.print()" class="px-5 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-teal-500/20 text-xs flex items-center gap-2 transition">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <span>Print / Export Official Medical PDF Report</span>
+                </button>
+            </div>
+
+            <!-- Printable Report Container -->
+            <div id="printable-report" class="bg-white rounded-2xl p-8 border border-slate-300 shadow-2xl max-w-4xl mx-auto space-y-6 text-slate-900 font-sans">
+                
+                <!-- Header -->
+                <div class="border-b-2 border-slate-900 pb-4 flex justify-between items-start">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl">👁️</span>
+                            <h2 class="text-2xl font-black uppercase tracking-tight text-slate-900">Diabetic Retinopathy Tele-Screening Report</h2>
+                        </div>
+                        <p class="text-xs font-semibold text-teal-800 mt-1">RetinaXAI Tele-Ophthalmology Network — Government Primary Health Centre System</p>
+                    </div>
+                    <div class="text-right text-xs">
+                        <p class="font-bold">Nanded District Civil Hospital Hub</p>
+                        <p class="text-slate-600 font-mono" id="rep-date">Date: Oct 24, 2026</p>
+                        <p class="text-slate-600 font-mono">Report ID: R-8942-XAI</p>
+                    </div>
+                </div>
+
+                <!-- Patient Metadata Table -->
+                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+                    <div>
+                        <p><strong class="text-slate-600">Patient ID:</strong> <span id="rep-pid" class="font-mono font-bold">PHC-NND-2026-894</span></p>
+                        <p><strong class="text-slate-600">Patient Name:</strong> <span id="rep-pname" class="font-bold">Ramesh Patil</span></p>
+                        <p><strong class="text-slate-600">Age / Gender:</strong> <span id="rep-page">54 Yrs / Male</span></p>
+                    </div>
+                    <div>
+                        <p><strong class="text-slate-600">Acquisition Facility:</strong> PHC Node #04 (Nanded)</p>
+                        <p><strong class="text-slate-600">Examined Eye:</strong> Right Eye (OD)</p>
+                        <p><strong class="text-slate-600">Camera Unit:</strong> Handheld Non-Mydriatic 45°</p>
+                    </div>
+                </div>
+
+                <!-- Classification Banner -->
+                <div class="p-4 rounded-xl border-2 border-amber-500 bg-amber-50 flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-900 block">AI Diagnostic Classification (ICDR)</span>
+                        <h3 id="rep-icdr" class="text-xl font-extrabold text-amber-950">Level 2: Moderate Non-Proliferative DR (NPDR)</h3>
+                    </div>
+                    <div class="text-right">
+                        <span id="rep-triage-badge" class="inline-block px-3 py-1 rounded-full text-xs font-extrabold bg-rose-700 text-white">REFERABLE DR (Level 2+)</span>
+                        <p id="rep-conf-val" class="text-xs text-slate-600 font-semibold mt-1">Calibrated Confidence: 91.4% ($T=1.42$)</p>
+                    </div>
+                </div>
+
+                <!-- Image Canvases -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <span class="text-xs font-bold text-slate-700 block">Enhanced Green Channel Scan</span>
+                        <div class="border border-slate-300 rounded-xl overflow-hidden bg-black">
+                            <canvas id="repCanvasRaw" width="400" height="280" class="w-full h-auto"></canvas>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-xs font-bold text-slate-700 block">Grad-CAM Heatmap & Lesion Overlays</span>
+                        <div class="border border-slate-300 rounded-xl overflow-hidden bg-black">
+                            <canvas id="repCanvasOverlay" width="400" height="280" class="w-full h-auto"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Biomarker Table -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Quantified Pathological Biomarkers</h4>
+                    <table class="w-full text-left text-xs border border-slate-200">
+                        <thead class="bg-slate-100 font-bold text-slate-800">
+                            <tr>
+                                <th class="p-2 border-b">Biomarker / Lesion Type</th>
+                                <th class="p-2 border-b">Detected Count / Area</th>
+                                <th class="p-2 border-b">Foveal Proximity</th>
+                                <th class="p-2 border-b">Clinical Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rep-biomarker-rows" class="divide-y divide-slate-200">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Doctor Validation Sign-off -->
+                <div class="border-2 border-slate-300 rounded-xl p-4 space-y-3 bg-slate-50 text-xs">
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                        <h4 class="font-bold text-slate-900">Ophthalmologist Clinical Sign-Off</h4>
+                        <span class="text-slate-500 italic">Validated via Telemedicine Link</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200">
+                            <input type="radio" name="doc-confirm" checked class="text-teal-600">
+                            <span class="font-bold text-emerald-800">Confirm AI Diagnosis</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200">
+                            <input type="radio" name="doc-confirm" class="text-teal-600">
+                            <span class="font-bold text-amber-800">Override Severity Grade</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-200">
+                            <input type="radio" name="doc-confirm" class="text-teal-600">
+                            <span class="font-bold text-rose-800">Request Recapture</span>
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div>
+                            <label class="text-slate-600 block mb-1 font-medium">Reviewing Ophthalmologist Notes</label>
+                            <textarea rows="2" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs focus:outline-none" placeholder="Confirmed Moderate NPDR. Referred to Tuesday Laser Clinic..."></textarea>
+                        </div>
+                        <div class="flex flex-col justify-end space-y-1 text-right">
+                            <div class="border-b border-slate-400 w-48 ml-auto h-8"></div>
+                            <span class="font-bold text-slate-900">Dr. S. K. Deshmukh, MD (Ophthal)</span>
+                            <span class="text-[10px] text-slate-500">Reg No: MH-2012-084920</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 6: ARCHITECTURE & PATHOLOGY ATLAS -->
+        <section id="content-atlas" class="tab-content hidden space-y-6">
+            <div class="glass-panel rounded-2xl p-6 space-y-6 shadow-xl">
+                
+                <div class="border-b border-slate-800 pb-3">
+                    <h3 class="text-xl font-bold text-white">System Architecture & MATLAB Deep Learning Pipeline</h3>
+                    <p class="text-xs text-slate-400">Native MATLAB Image Processing & Deep Learning Toolbox implementation spec</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <span class="font-bold text-teal-300 text-sm block">Stage 1: Edge IQA</span>
+                        <p class="text-slate-400">2D Haar wavelet energy metrics check blur. Adaptive CLAHE on green channel $I_G$ ($8\times8$ grid) enhances microvascular contrast.</p>
+                        <span class="text-[10px] text-slate-500 font-mono block">Toolbox: Image Processing</span>
+                    </div>
+
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <span class="font-bold text-indigo-300 text-sm block">Stage 2: Patch Detection</span>
+                        <p class="text-slate-400">FPN extracts Optic Disc & Fovea coordinates. Sliding-window YOLOv9 on $256\times256$ patches detects 1-3 px microaneurysms.</p>
+                        <span class="text-[10px] text-slate-500 font-mono block">Toolbox: Deep Learning</span>
+                    </div>
+
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <span class="font-bold text-amber-300 text-sm block">Stage 3 & 4: Ensemble & XAI</span>
+                        <p class="text-slate-400">Vision Transformer (ViT-B16) fused with feature vectors. Temperature scaling ($T=1.42$) calibrates logit probabilities.</p>
+                        <span class="text-[10px] text-slate-500 font-mono block">Toolbox: Statistics & ML</span>
+                    </div>
+
+                    <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <span class="font-bold text-emerald-300 text-sm block">Stage 5: Simulink Discrete</span>
+                        <p class="text-slate-400">SimEvents models patient queues, 2G/3G uplink delays, GPU thread queues ($M/M/c/K$), and specialist triaging.</p>
+                        <span class="text-[10px] text-slate-500 font-mono block">Toolbox: Simulink & SimEvents</span>
+                    </div>
+                </div>
+
+                <!-- Pathology Atlas Table -->
+                <div class="space-y-3 pt-4 border-t border-slate-800">
+                    <h4 class="font-bold text-white text-sm">Ocular Pathology Clinical Reference Atlas</h4>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left text-xs text-slate-300 border border-slate-800">
+                            <thead class="bg-slate-900 text-slate-200 font-bold">
+                                <tr>
+                                    <th class="p-3 border-b border-slate-800">Pathology Feature</th>
+                                    <th class="p-3 border-b border-slate-800">Morphological Attributes</th>
+                                    <th class="p-3 border-b border-slate-800">MATLAB Algorithm</th>
+                                    <th class="p-3 border-b border-slate-800">Clinical Significance</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/80 font-sans">
+                                <tr>
+                                    <td class="p-3 font-bold text-white">Optic Disc (OD)</td>
+                                    <td class="p-3">Bright circular landmark (1.5-1.8 mm)</td>
+                                    <td class="p-3 font-mono text-teal-300">FPN Segmentation + Hough</td>
+                                    <td class="p-3">Spatial anchor; eliminates false exudates</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-white">Fovea & FAZ</td>
+                                    <td class="p-3">Dark capillary-free zone temporal to OD</td>
+                                    <td class="p-3 font-mono text-teal-300">2.5 OD-diameter Search Window</td>
+                                    <td class="p-3">Assesses macular edema risk</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-red-400">Microaneurysms (MAs)</td>
+                                    <td class="p-3">Small red circular dots (10-100 μm, 1-3 px)</td>
+                                    <td class="p-3 font-mono text-teal-300">Patch YOLOv9 ($256^2$ Window)</td>
+                                    <td class="p-3">Earliest marker (Level 1 NPDR)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-amber-300">Hard Exudates (EXs)</td>
+                                    <td class="p-3">Bright yellow lipid deposits with sharp margins</td>
+                                    <td class="p-3 font-mono text-teal-300">Green Top-Hat + FPN Mask</td>
+                                    <td class="p-3">Primary biomarker for Macular Edema</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-purple-400">Neovascularization (NV)</td>
+                                    <td class="p-3">Fragile new vessel growth on disc or retina</td>
+                                    <td class="p-3 font-mono text-teal-300">Curvature Vessel Tree Graph</td>
+                                    <td class="p-3">Hallmark of Proliferative DR (Level 4)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Application Logic & Interactivity -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Clinical Case Presets
+        const presets = {
+            mod_npdr: {
+                id: "PHC-NND-2026-894",
+                name: "Ramesh Patil",
+                age: "54 Yrs / Male",
+                duration: "8 Yrs (HbA1c 8.4%)",
+                eye: "OD",
+                grade: "Level 2: Moderate NPDR",
+                triage: "REFERABLE DR (High Risk)",
+                triageClass: "text-rose-400",
+                calConf: 91.4,
+                mas: 14,
+                exArea: "0.82 mm²",
+                iqaPass: true,
+                lesions: [
+                    { id: "MA-01", type: "Microaneurysm", coords: "(x: 420, y: 231)", score: "0.94", proximity: "1.2 mm Temporal" },
+                    { id: "MA-02", type: "Microaneurysm", coords: "(x: 456, y: 215)", score: "0.91", proximity: "1.0 mm Superior" },
+                    { id: "EX-01", type: "Hard Exudate Cluster", coords: "(x: 480, y: 220)", score: "0.98", proximity: "0.9 mm Macula" },
+                    { id: "HE-01", type: "Blot Hemorrhage", coords: "(x: 360, y: 165)", score: "0.89", proximity: "1.8 mm Inferior" }
+                ],
+                shapData: [35, 28, 18, 12, 7],
+                biomarkers: [
+                    { name: "Microaneurysms (MAs)", count: "14 Dots", proximity: "1.2 mm Temporal", significance: "Moderate NPDR Criterion Met" },
+                    { name: "Hard Exudates (EXs)", count: "0.82 mm²", proximity: "0.9 mm Superior to Macula", significance: "DME Risk Monitoring" },
+                    { name: "Intraretinal Hemorrhages", count: "6 Blot Hemorrhages", proximity: "Inferior Quadrant", significance: "Grade 2 Classification" }
+                ]
+            },
+            normal: {
+                id: "PHC-NND-2026-902",
+                name: "Anita Devi",
+                age: "48 Yrs / Female",
+                duration: "3 Yrs (HbA1c 6.2%)",
+                eye: "OD",
+                grade: "Level 0: No DR Detected",
+                triage: "NON-REFERABLE (Low Risk)",
+                triageClass: "text-emerald-400",
+                calConf: 98.6,
+                mas: 0,
+                exArea: "0.00 mm²",
+                iqaPass: true,
+                lesions: [],
+                shapData: [2, 1, 1, 0, 0],
+                biomarkers: [
+                    { name: "Optic Disc & Vessels", count: "Normal Limits", proximity: "Centered", significance: "Healthy Retinal Architecture" }
+                ]
+            },
+            pdr: {
+                id: "PHC-NND-2026-915",
+                name: "Gopal Rao",
+                age: "62 Yrs / Male",
+                duration: "14 Yrs (HbA1c 9.6%)",
+                eye: "OD",
+                grade: "Level 4: Proliferative DR",
+                triage: "URGENT REFERABLE (Critical)",
+                triageClass: "text-purple-400",
+                calConf: 96.2,
+                mas: 38,
+                exArea: "2.45 mm²",
+                iqaPass: true,
+                lesions: [
+                    { id: "NV-01", type: "Neovascularization (NVD)", coords: "(x: 250, y: 300)", score: "0.99", proximity: "On Optic Disc" },
+                    { id: "MA-12", type: "Microaneurysm Cluster", coords: "(x: 510, y: 280)", score: "0.97", proximity: "0.4 mm Macula" }
+                ],
+                shapData: [45, 30, 25, 20, 15],
+                biomarkers: [
+                    { name: "Neovascularization (NV)", count: "3 Branches", proximity: "NVD (Disc) & NVE", significance: "High Risk Proliferative DR" },
+                    { name: "Microaneurysms / Hemorrhages", count: "38 MAs / 18 HEs", proximity: "All 4 Quadrants", significance: "Severe Ischemia" }
+                ]
+            },
+            bad_iqa: {
+                id: "PHC-NND-2026-920",
+                name: "Sunita Shinde",
+                age: "58 Yrs / Female",
+                duration: "6 Yrs (HbA1c 8.1%)",
+                eye: "OD",
+                grade: "Ungradeable (IQA Rejected)",
+                triage: "RECAPTURE REQUIRED",
+                triageClass: "text-slate-400",
+                calConf: 0,
+                mas: 0,
+                exArea: "0",
+                iqaPass: false,
+                lesions: [],
+                shapData: [0, 0, 0, 0, 0],
+                biomarkers: []
+            }
+        };
+
+        let currentPresetKey = 'mod_npdr';
+        let currentTool = 'select'; // 'select' or 'ruler'
+        let isInverted = false;
+        let rulerStart = null;
+        let rulerEnd = null;
+
+        // Chart Handles
+        let chartShap = null;
+        let chartHistoryDR = null;
+        let chartHistoryHbA1c = null;
+        let chartSimLatency = null;
+        let chartSimWorkload = null;
+
+        function drawFundusCanvas(canvasId, presetKey) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            const data = presets[presetKey];
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Background
+            ctx.fillStyle = "#030712";
+            ctx.fillRect(0, 0, w, h);
+
+            if (!data.iqaPass && presetKey === 'bad_iqa') {
+                ctx.fillStyle = "#1e1b18";
+                ctx.beginPath();
+                ctx.arc(w/2, h/2, w*0.4, 0, Math.PI * 2);
+                ctx.fill();
+                return;
+            }
+
+            const rawChecked = document.getElementById('layer-raw')?.checked ?? true;
+            const claheChecked = document.getElementById('layer-clahe')?.checked ?? true;
+            const gradcamChecked = document.getElementById('layer-gradcam')?.checked ?? true;
+            const maChecked = document.getElementById('layer-ma')?.checked ?? true;
+            const exChecked = document.getElementById('layer-ex')?.checked ?? true;
+            const landmarkChecked = document.getElementById('layer-landmarks')?.checked ?? true;
+            
+            const opacityVal = (document.getElementById('gradcam-opacity')?.value ?? 65) / 100;
+            const contrastVal = (document.getElementById('contrast-val')?.value ?? 120) / 100;
+
+            // Retinal Gradient Base
+            const grad = ctx.createRadialGradient(w*0.5, h*0.5, w*0.05, w*0.5, h*0.5, w*0.44);
+            if (claheChecked) {
+                grad.addColorStop(0, `rgba(200, 90, 20, ${contrastVal})`);
+                grad.addColorStop(0.7, `rgba(130, 45, 10, ${contrastVal})`);
+                grad.addColorStop(1, '#020617');
+            } else {
+                grad.addColorStop(0, '#7c2d12');
+                grad.addColorStop(0.7, '#451a03');
+                grad.addColorStop(1, '#000000');
+            }
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(w/2, h/2, w*0.44, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Vascular Tree Arc Lines
+            ctx.strokeStyle = claheChecked ? "rgba(60, 15, 8, 0.95)" : "rgba(40, 10, 5, 0.8)";
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            const odX = w * 0.3;
+            const odY = h * 0.5;
+
+            // Arches
+            ctx.moveTo(odX, odY);
+            ctx.bezierCurveTo(odX + 90, odY - 140, odX + 240, odY - 200, odX + 340, odY - 210);
+            ctx.moveTo(odX, odY);
+            ctx.bezierCurveTo(odX + 90, odY + 140, odX + 240, odY + 200, odX + 340, odY + 210);
+            ctx.stroke();
+
+            // Landmarks (OD & Fovea)
+            if (landmarkChecked) {
+                // Optic Disc
+                ctx.fillStyle = "#fef08a";
+                ctx.beginPath();
+                ctx.arc(odX, odY, 38, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = "#10b981";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Disc Label
+                ctx.fillStyle = "#10b981";
+                ctx.font = "10px JetBrains Mono";
+                ctx.fillText("Optic Disc (1.6mm)", odX - 45, odY - 45);
+
+                // Fovea
+                const fovX = w * 0.62;
+                const fovY = h * 0.5;
+                ctx.fillStyle = "#1c0a05";
+                ctx.beginPath();
+                ctx.arc(fovX, fovY, 22, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = "#14b8a6";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = "#14b8a6";
+                ctx.fillText("Fovea / FAZ", fovX - 30, fovY - 30);
+            }
+
+            // Grad-CAM Heatmap
+            if (gradcamChecked && data.grade !== "Level 0: No DR Detected") {
+                const heatGrad = ctx.createRadialGradient(w*0.6, h*0.42, 10, w*0.6, h*0.42, 130);
+                heatGrad.addColorStop(0, `rgba(239, 68, 68, ${opacityVal})`);
+                heatGrad.addColorStop(0.5, `rgba(245, 158, 11, ${opacityVal * 0.6})`);
+                heatGrad.addColorStop(1, 'rgba(16, 185, 129, 0)');
+                ctx.fillStyle = heatGrad;
+                ctx.beginPath();
+                ctx.arc(w*0.6, h*0.42, 130, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Hard Exudates (Yellow Clusters)
+            if (exChecked && (presetKey === 'mod_npdr' || presetKey === 'pdr')) {
+                ctx.fillStyle = "#fef08a";
+                const exSpots = [
+                    {x: w*0.58, y: h*0.38, r: 8}, {x: w*0.6, y: h*0.36, r: 6},
+                    {x: w*0.62, y: h*0.4, r: 10}, {x: w*0.56, y: h*0.45, r: 7}
+                ];
+                exSpots.forEach(s => {
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+
+            // Microaneurysm Bounding Boxes
+            if (maChecked && (presetKey === 'mod_npdr' || presetKey === 'pdr')) {
+                const maSpots = [
+                    {x: w*0.5, y: h*0.42}, {x: w*0.53, y: h*0.39}, {x: w*0.57, y: h*0.48},
+                    {x: w*0.64, y: h*0.33}, {x: w*0.48, y: h*0.58}
+                ];
+                maSpots.forEach(m => {
+                    ctx.fillStyle = "#ef4444";
+                    ctx.beginPath();
+                    ctx.arc(m.x, m.y, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = "#f87171";
+                    ctx.lineWidth = 1.2;
+                    ctx.strokeRect(m.x - 7, m.y - 7, 14, 14);
+                });
+            }
+
+            // Draw Ruler Line if active
+            if (rulerStart && rulerEnd && canvasId === 'fundusCanvas') {
+                ctx.strokeStyle = "#38bdf8";
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(rulerStart.x, rulerStart.y);
+                ctx.lineTo(rulerEnd.x, rulerEnd.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Draw end dots
+                ctx.fillStyle = "#0284c7";
+                ctx.beginPath();
+                ctx.arc(rulerStart.x, rulerStart.y, 4, 0, Math.PI*2);
+                ctx.arc(rulerEnd.x, rulerEnd.y, 4, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            // Invert colors if active
+            if (isInverted) {
+                const imgData = ctx.getImageData(0, 0, w, h);
+                const d = imgData.data;
+                for (let i = 0; i < d.length; i += 4) {
+                    d[i] = 255 - d[i];
+                    d[i+1] = 255 - d[i+1];
+                    d[i+2] = 255 - d[i+2];
+                }
+                ctx.putImageData(imgData, 0, 0);
+            }
+        }
+
+        function renderCanvasLayers() {
+            drawFundusCanvas('fundusCanvas', currentPresetKey);
+            drawFundusCanvas('repCanvasRaw', currentPresetKey);
+            drawFundusCanvas('repCanvasOverlay', currentPresetKey);
+
+            const op = document.getElementById('gradcam-opacity')?.value ?? 65;
+            const ct = document.getElementById('contrast-val')?.value ?? 120;
+            if (document.getElementById('opacity-val')) document.getElementById('opacity-val').innerText = `${op}%`;
+            if (document.getElementById('contrast-disp')) document.getElementById('contrast-disp').innerText = `${(ct/100).toFixed(1)}x`;
+        }
+
+        function loadPreset(key) {
+            currentPresetKey = key;
+            const d = presets[key];
+
+            document.getElementById('p-id').value = d.id;
+            document.getElementById('p-name').value = d.name;
+            document.getElementById('p-age').value = d.age;
+            document.getElementById('p-duration').value = d.duration;
+
+            // Toggle IQA Banner
+            const rejOverlay = document.getElementById('iqa-rejection-overlay');
+            if (!d.iqaPass) {
+                rejOverlay.classList.remove('hidden');
+            } else {
+                rejOverlay.classList.add('hidden');
+            }
+
+            // Update Metrics
+            document.getElementById('res-grade').innerText = d.grade;
+            document.getElementById('res-triage').innerText = d.triage;
+            document.getElementById('res-triage').className = `text-sm font-extrabold ${d.triageClass}`;
+            document.getElementById('res-conf').innerText = `${d.calConf}% (T=1.42)`;
+            document.getElementById('res-lesions').innerText = `${d.mas} MAs | ${d.exArea} EX`;
+
+            // Update Lesion Coordinates Table
+            const lTable = document.getElementById('workbench-lesion-rows');
+            lTable.innerHTML = '';
+            d.lesions.forEach(l => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/50";
+                tr.innerHTML = `
+                    <td class="p-2 font-bold text-teal-300">${l.id}</td>
+                    <td class="p-2 text-slate-200">${l.type}</td>
+                    <td class="p-2 text-slate-400">${l.coords}</td>
+                    <td class="p-2 font-bold text-emerald-400">${l.score}</td>
+                    <td class="p-2 text-amber-300">${l.proximity}</td>
+                `;
+                lTable.appendChild(tr);
+            });
+
+            // Update Report Fields
+            document.getElementById('rep-pid').innerText = d.id;
+            document.getElementById('rep-pname').innerText = d.name;
+            document.getElementById('rep-page').innerText = d.age;
+            document.getElementById('rep-icdr').innerText = d.grade;
+            document.getElementById('rep-triage-badge').innerText = d.triage;
+
+            const bTable = document.getElementById('rep-biomarker-rows');
+            bTable.innerHTML = '';
+            d.biomarkers.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2 border-b font-bold text-slate-800">${b.name}</td>
+                    <td class="p-2 border-b">${b.count}</td>
+                    <td class="p-2 border-b">${b.proximity}</td>
+                    <td class="p-2 border-b text-teal-800 font-semibold">${b.significance}</td>
+                `;
+                bTable.appendChild(tr);
+            });
+
+            // Update SHAP Chart
+            initShapChart(d.shapData);
+            renderCanvasLayers();
+        }
+
+        function runAIPipeline() {
+            const steps = [1, 2, 3, 4, 5];
+            const pBar = document.getElementById('pipeline-progress');
+            const statusTag = document.getElementById('pipeline-status-tag');
+            statusTag.innerText = "Running GPU...";
+            statusTag.className = "text-[10px] text-teal-400 font-mono animate-pulse";
+            
+            steps.forEach((step, idx) => {
+                setTimeout(() => {
+                    pBar.style.width = `${(idx + 1) * 20}%`;
+                    const sElem = document.getElementById(`step-${step}`);
+                    sElem.className = "flex items-center justify-between text-teal-300 font-bold";
+                    sElem.querySelector('.step-badge').innerText = "OK ✓";
+                    sElem.querySelector('.step-badge').className = "step-badge text-emerald-400";
+
+                    if (idx === 4) {
+                        statusTag.innerText = "Completed";
+                        statusTag.className = "text-[10px] text-emerald-400 font-mono";
+                        loadPreset(currentPresetKey);
+                    }
+                }, (idx + 1) * 280);
+            });
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+
+            if (tabId === 'history') {
+                initHistoryCharts();
+            } else if (tabId === 'queue') {
+                initSimulinkCharts();
+                populatePHCGrid();
+            } else if (tabId === 'report' || tabId === 'workbench') {
+                renderCanvasLayers();
+            }
+        }
+
+        function toggleEye(side) {
+            document.getElementById('btn-eye-od').className = side === 'OD' ? "px-3 py-1 text-xs rounded-lg font-bold bg-teal-500 text-slate-950 transition" : "px-3 py-1 text-xs rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+            document.getElementById('btn-eye-os').className = side === 'OS' ? "px-3 py-1 text-xs rounded-lg font-bold bg-teal-500 text-slate-950 transition" : "px-3 py-1 text-xs rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+            document.getElementById('tool-select').className = tool === 'select' ? "p-1.5 rounded-lg bg-teal-500/20 text-teal-300 border border-teal-500/40" : "p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700";
+            document.getElementById('tool-ruler').className = tool === 'ruler' ? "p-1.5 rounded-lg bg-teal-500/20 text-teal-300 border border-teal-500/40" : "p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700";
+            
+            if (tool !== 'ruler') {
+                rulerStart = null;
+                rulerEnd = null;
+                document.getElementById('ruler-info-box').classList.add('hidden');
+                renderCanvasLayers();
+            }
+        }
+
+        function toggleInvert() {
+            isInverted = !isInverted;
+            renderCanvasLayers();
+        }
+
+        function resetZoom() {
+            rulerStart = null;
+            rulerEnd = null;
+            isInverted = false;
+            document.getElementById('ruler-info-box').classList.add('hidden');
+            renderCanvasLayers();
+        }
+
+        function initShapChart(shapValues) {
+            const ctx = document.getElementById('chartShap').getContext('2d');
+            if (chartShap) chartShap.destroy();
+
+            chartShap = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Hard Exudates Cluster', 'Microaneurysms Count', 'Hemorrhage Density', 'Fovea Encroachment', 'Vessel Tortuosity'],
+                    datasets: [{
+                        label: 'SHAP Contribution Value (%)',
+                        data: shapValues,
+                        backgroundColor: '#14b8a6',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                        y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function initHistoryCharts() {
+            if (chartHistoryDR) return;
+
+            const ctxDR = document.getElementById('chartHistoryDR').getContext('2d');
+            chartHistoryDR = new Chart(ctxDR, {
+                type: 'line',
+                data: {
+                    labels: ['Nov 2024', 'Oct 2025', 'Apr 2026', 'Oct 2026 (Now)'],
+                    datasets: [
+                        {
+                            label: 'ICDR Grade Level (0-4)',
+                            data: [0, 1, 1, 2],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Microaneurysms Count',
+                            data: [0, 2, 4, 14],
+                            borderColor: '#ef4444',
+                            borderDash: [5, 5],
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } },
+                    scales: {
+                        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            const ctxHb = document.getElementById('chartHistoryHbA1c').getContext('2d');
+            chartHistoryHbA1c = new Chart(ctxHb, {
+                type: 'bar',
+                data: {
+                    labels: ['Nov 2024', 'Oct 2025', 'Apr 2026', 'Oct 2026 (Now)'],
+                    datasets: [{
+                        label: 'HbA1c Level (%)',
+                        data: [6.8, 7.6, 7.9, 8.4],
+                        backgroundColor: '#14b8a6',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#cbd5e1' } } },
+                    scales: {
+                        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' }, min: 5, max: 10 }
+                    }
+                }
+            });
+        }
+
+        function initSimulinkCharts() {
+            if (chartSimLatency) return;
+
+            const ctxLat = document.getElementById('chartSimLatency').getContext('2d');
+            chartSimLatency = new Chart(ctxLat, {
+                type: 'bar',
+                data: {
+                    labels: ['2G Mobile Network', '3G Data Network', '4G LTE Tower'],
+                    datasets: [
+                        {
+                            label: 'Raw Payload (12 MB Uncompressed)',
+                            data: [1500, 120, 15],
+                            backgroundColor: '#ef4444'
+                        },
+                        {
+                            label: 'RetinaXAI Edge Compressed (~800 KB)',
+                            data: [100, 8, 1.2],
+                            backgroundColor: '#10b981'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { type: 'logarithmic', grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { color: '#1e293b' }, ticks: { color: '#cbd5e1' } }
+                    },
+                    plugins: { legend: { labels: { color: '#cbd5e1' } } }
+                }
+            });
+
+            const ctxWork = document.getElementById('chartSimWorkload').getContext('2d');
+            chartSimWorkload = new Chart(ctxWork, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Auto-Archived Non-Referable (Level 0/1)', 'Specialist Review Queue (Referable Level 2+)'],
+                    datasets: [{
+                        data: [78, 22],
+                        backgroundColor: ['#0d9488', '#f59e0b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } }
+                }
+            });
+        }
+
+        function updateSimulinkModel() {
+            const lambda = document.getElementById('sim-lambda').value;
+            document.getElementById('sim-lambda-val').innerText = `${lambda} Patients / Day / PHC`;
+        }
+
+        function populatePHCGrid() {
+            const grid = document.getElementById('phc-nodes-grid');
+            if (grid.children.length > 0) return;
+
+            for (let i = 1; i <= 20; i++) {
+                const div = document.createElement('div');
+                div.className = "p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex justify-between items-center";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-bold text-slate-200 font-mono block">PHC Node #${i < 10 ? '0' + i : i}</span>
+                        <span class="text-[10px] text-slate-400 font-mono">Queue: ${Math.floor(Math.random() * 5)} items</span>
+                    </div>
+                    <span class="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                `;
+                grid.appendChild(div);
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const txt = input.value.trim();
+            if (!txt) return;
+
+            const win = document.getElementById('chat-window');
+            const div = document.createElement('div');
+            div.className = "flex items-start space-x-2";
+            div.innerHTML = `
+                <div class="h-7 w-7 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-[10px]">PHC</div>
+                <div class="bg-slate-800 p-3 rounded-2xl rounded-tl-none max-w-[80%] border border-slate-700 space-y-1">
+                    <div class="flex justify-between items-center text-[10px] text-slate-400 font-mono">
+                        <span>Dr. A. Kulkarni (PHC)</span>
+                        <span>Just Now</span>
+                    </div>
+                    <p class="text-slate-200">${txt}</p>
+                </div>
+            `;
+            win.appendChild(div);
+            input.value = '';
+            win.scrollTop = win.scrollHeight;
+        }
+
+        function triggerSimulatedDoctorReply() {
+            const win = document.getElementById('chat-window');
+            const div = document.createElement('div');
+            div.className = "flex items-start space-x-2 justify-end";
+            div.innerHTML = `
+                <div class="bg-teal-950/80 p-3 rounded-2xl rounded-tr-none max-w-[80%] border border-teal-500/30 space-y-1">
+                    <div class="flex justify-between items-center text-[10px] text-teal-400 font-mono">
+                        <span>Dr. S. K. Deshmukh (Specialist)</span>
+                        <span>Just Now</span>
+                    </div>
+                    <p class="text-teal-100">Escalation received and logged into Civil Hospital triage database. Patient has been added to priority clinic list.</p>
+                </div>
+                <div class="h-7 w-7 rounded-full bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold text-[10px]">MD</div>
+            `;
+            win.appendChild(div);
+            win.scrollTop = win.scrollHeight;
+        }
+
+        // Canvas Ruler Mouse Event Handlers
+        const fundusCanvas = document.getElementById('fundusCanvas');
+        if (fundusCanvas) {
+            fundusCanvas.addEventListener('mousedown', (e) => {
+                if (currentTool !== 'ruler') return;
+                const rect = fundusCanvas.getBoundingClientRect();
+                const scaleX = fundusCanvas.width / rect.width;
+                const scaleY = fundusCanvas.height / rect.height;
+                rulerStart = { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+                rulerEnd = rulerStart;
+                document.getElementById('ruler-info-box').classList.remove('hidden');
+            });
+
+            fundusCanvas.addEventListener('mousemove', (e) => {
+                if (currentTool !== 'ruler' || !rulerStart) return;
+                const rect = fundusCanvas.getBoundingClientRect();
+                const scaleX = fundusCanvas.width / rect.width;
+                const scaleY = fundusCanvas.height / rect.height;
+                rulerEnd = { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+
+                const dx = rulerEnd.x - rulerStart.x;
+                const dy = rulerEnd.y - rulerStart.y;
+                const distPx = Math.sqrt(dx*dx + dy*dy);
+                // Approx 100px = 1.0mm in fundus calibration
+                const distMm = distPx / 100.0;
+
+                document.getElementById('ruler-dist-px').innerText = `Distance: ${Math.round(distPx)} px`;
+                document.getElementById('ruler-dist-mm').innerText = `Distance: ${distMm.toFixed(2)} mm (${Math.round(distMm*1000)} μm)`;
+
+                renderCanvasLayers();
+            });
+
+            fundusCanvas.addEventListener('mouseup', () => {
+                if (currentTool === 'ruler') {
+                    // Ruler line complete
+                }
+            });
+        }
+
+        // Window Load Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPreset('mod_npdr');
+        });
+    </script>
+</body>
+</html>
